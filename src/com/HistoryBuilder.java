@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
  */
 public class HistoryBuilder {
 
-    private final String regex = "([rw][\\d]+\\([a-z]\\)||[ca][\\d]+)+";
+    private final String regex = "(([rw][\\d]+\\([a-z]\\))||([ca][\\d]+))+";
 
     private boolean validate(String history){
         return history.matches(regex);

@@ -29,7 +29,6 @@ public class RandomHistoryGenerator {
             }
         }
         Collections.shuffle(history.getOperationList());
-        /* TODO commits should be always the last operation of transaction/last operation of history */
         for(int i=1; i<=noOfTransactions; i++) {
             history.addOperation(new Operation(i, OperationType.COMMIT));
         }

@@ -54,16 +54,35 @@ public class History {
      */
     public boolean isValid(){
 
-        /* TODO is a transaction valid if contains only commits? commits should be always the last operation of transaction/last operation of history */
-
         long transactionsNo = operationList.stream().filter(distinctByKey(Operation::getTransactionID)).count();
         Map<Integer, Long> transactionSteps = operationList.stream().collect(Collectors.groupingBy(Operation::getTransactionID, Collectors.counting()));
         long maximumStepsNo = Collections.max(transactionSteps.entrySet(), Map.Entry.comparingByValue()).getValue();
         long distinctCommitsNo = operationList.stream().filter(operation -> operation.getOperationType().equals(OperationType.COMMIT)).filter(distinctByKey(Operation::getTransactionID)).count();
         long abortsNo =  operationList.stream().filter(operation -> operation.getOperationType().equals(OperationType.ABORT)).count();
 
-        return transactionsNo <= Constants.MAX_TRANSACTIONS_NO && maximumStepsNo <= Constants.MAX_STEPS_PER_TRANSACTION_NO && distinctCommitsNo == transactionsNo && abortsNo == 0;
+        boolean ok = transactionsNo <= Constants.MAX_TRANSACTIONS_NO && maximumStepsNo <= Constants.MAX_STEPS_PER_TRANSACTION_NO && distinctCommitsNo == transactionsNo && abortsNo == 0;
+        if(ok){
+            for(Integer transactionID: transactionSteps.keySet()){
+                if(checkCommits(transactionID) == false) return false;
+            }
+        }
+        return true;
+    }
 
+    private boolean checkCommits(int transactionID){
+
+        List<Operation> transaction =  operationList.stream().filter(operation -> operation.getTransactionID() == transactionID).collect(Collectors.toList());
+
+        if(transaction.size() == 1)
+            return false;
+
+        if (transaction.stream().filter(operation -> operation.getOperationType().equals(OperationType.COMMIT)).count() != 1)
+            return false;
+
+        if(transaction.get(transaction.size() - 1).getOperationType() != OperationType.COMMIT)
+            return false;
+
+       return true;
     }
 
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
