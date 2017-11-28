@@ -8,7 +8,14 @@ public class Operation {
     private OperationType operationType;
     private int transactionID;
     private String variable;
-
+    public Operation(){
+        super();
+    }
+    public Operation(int transactionID, OperationType operationType){
+        super();
+        this.setTransactionID(transactionID);
+        this.setOperationType(operationType);
+    }
     public OperationType getOperationType() {
         return operationType;
     }
@@ -35,7 +42,7 @@ public class Operation {
 
     @Override
     public String toString() {
-        String variableToString = operationType.equals(OperationType.ABORT) || operationType.equals(OperationType.COMMIT) ? "" : "(" + variable + ")";
+        String variableToString = operationType.equals(OperationType.ABORT) || operationType.equals(OperationType.COMMIT) ? "" : "(" + getVariable() + ")";
         return operationType.toString() + transactionID + variableToString ;
     }
 }

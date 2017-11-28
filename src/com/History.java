@@ -54,7 +54,7 @@ public class History {
      */
     public boolean isValid(){
 
-        /* TODO if a transaction is valid if contains only commits? */
+        /* TODO is a transaction valid if contains only commits? commits should be always the last operation of transaction/last operation of history */
 
         long transactionsNo = operationList.stream().filter(distinctByKey(Operation::getTransactionID)).count();
         Map<Integer, Long> transactionSteps = operationList.stream().collect(Collectors.groupingBy(Operation::getTransactionID, Collectors.counting()));
@@ -62,7 +62,7 @@ public class History {
         long distinctCommitsNo = operationList.stream().filter(operation -> operation.getOperationType().equals(OperationType.COMMIT)).filter(distinctByKey(Operation::getTransactionID)).count();
         long abortsNo =  operationList.stream().filter(operation -> operation.getOperationType().equals(OperationType.ABORT)).count();
 
-        return transactionsNo <= 10 && maximumStepsNo <= 10 && distinctCommitsNo == transactionsNo && abortsNo == 0;
+        return transactionsNo <= Constants.MAX_TRANSACTIONS_NO && maximumStepsNo <= Constants.MAX_STEPS_PER_TRANSACTION_NO && distinctCommitsNo == transactionsNo && abortsNo == 0;
 
     }
 

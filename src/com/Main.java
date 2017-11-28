@@ -20,5 +20,7 @@ public class Main {
         else{
             System.out.println("An error occurred in parsing the input history!");
         }
+        History h = RandomHistoryGenerator.generate();
+        System.out.println(h.toString());
     }
 }
