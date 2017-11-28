@@ -1,12 +1,24 @@
 package com;
 
+import java.util.Scanner;
+
 public class Main {
 
     public static void main(String[] args) {
-        String historyAsString = "r1(x)w1(x)c1";
-        HistoryBuilder historyBuilder = new HistoryBuilder();
-        History history = historyBuilder.getHistoryFromLine(historyAsString);
-        if(history!=null) {
+        Scanner s = new Scanner(System.in);
+        History history;
+        if(args.length !=0 && args[0].equals("randomGeneration")){
+            history = RandomHistoryGenerator.generate();
+            System.out.println("Generating random history!");
+            System.out.println(history.toString());
+        } else {
+            System.out.print("Reading History = ");
+            String historyAsString = s.nextLine();
+            HistoryBuilder historyBuilder = new HistoryBuilder();
+            history = historyBuilder.getHistoryFromLine(historyAsString);
+        }
+
+        if(history != null) {
             if(history.isValid()){
                 System.out.println("The history is valid!");
                 if(history.isCSR())  System.out.println("The history is CSR!"); else System.out.println("The history is not CSR!");
@@ -20,7 +32,11 @@ public class Main {
         else{
             System.out.println("An error occurred in parsing the input history!");
         }
-        History h = RandomHistoryGenerator.generate();
-        System.out.println(h.toString());
+
+        System.out.println("Close console to exit!");
+        while(s.hasNext()){
+
+        }
+
     }
 }
