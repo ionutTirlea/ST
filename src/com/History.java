@@ -63,7 +63,7 @@ public class History {
         boolean ok = transactionsNo <= Constants.MAX_TRANSACTIONS_NO && maximumStepsNo <= Constants.MAX_STEPS_PER_TRANSACTION_NO && distinctCommitsNo == transactionsNo && abortsNo == 0;
         if(ok){
             for(Integer transactionID: transactionSteps.keySet()){
-                if(checkCommits(transactionID) == false) return false;
+                if(!checkCommits(transactionID)) return false;
             }
         }
         return true;
