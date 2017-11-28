@@ -54,7 +54,7 @@ public class History {
      */
     public boolean isValid(){
 
-        /* TODO is a transaction valid if contains only commits? */
+        /* TODO if a transaction is valid if contains only commits? */
 
         long transactionsNo = operationList.stream().filter(distinctByKey(Operation::getTransactionID)).count();
         Map<Integer, Long> transactionSteps = operationList.stream().collect(Collectors.groupingBy(Operation::getTransactionID, Collectors.counting()));
