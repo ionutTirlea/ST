@@ -14,6 +14,8 @@ public class History {
 
     private List<Operation> operationList;
 
+    public Graph conflictGraph;
+
     public History(){
         operationList = new ArrayList<>();
     }
@@ -39,12 +41,64 @@ public class History {
         return s;
     }
 
-    public boolean isCSR(){ return false;}
+    public boolean isCSR(){
 
-    public boolean isOCSR(){ return false;}
+        if(conflictGraph == null){
+            conflictGraph = Graph.getConflictGraph(this);
+        }
 
-    public boolean isCOCSR(){ return false;}
+        return conflictGraph.isAcyclic();
 
+    }
+
+    public boolean isOCSR(){
+
+        if(conflictGraph == null){
+            conflictGraph = Graph.getConflictGraph(this);
+        }
+
+        if(!isCSR())
+            return false;
+
+        boolean isOCSR = true;
+
+        return isOCSR;
+    }
+
+    /*
+    *
+    * Schedule (or history) s is commit order preserving conflict serializable if
+    * for all ti, tj  transactopns(s): if there are p  ti, q  tj with (p,q)  conf(s) then ci < cj.
+    * COCSR denotes the class of all schedules with this property.
+    * */
+
+    public boolean isCOCSR(){
+
+        if(conflictGraph == null){
+            conflictGraph = Graph.getConflictGraph(this);
+        }
+
+        if(!isOCSR())
+            return false;
+
+        Map<Integer, Operation > conflictOperations;
+
+        conflictOperations =
+                this.getOperationList().stream()
+                        .filter(operation -> operation.getOperationType() == OperationType.COMMIT)
+                        .collect(Collectors.toMap(o -> o.getTransactionID(), o -> o));
+
+        for(Node conflictNode: conflictGraph.getNodes()){
+            for(Node adjacentConflictNode: conflictNode.getAdjacentNodes()){
+               if(this.getOperationList().indexOf(conflictOperations.get(conflictNode.getId())) > this.getOperationList().indexOf(conflictOperations.get(adjacentConflictNode.getId()))){
+                   return false;
+               }
+            }
+        }
+
+        return true;
+
+    }
     /**
      * Checks if the history is valid.
      * A history is valid if has maximum 10 transactions,

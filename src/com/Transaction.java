@@ -32,6 +32,6 @@ public class Transaction {
      * @return true if the History is valid, false otherwise.
      */
     public boolean isValid(){
-        return operationList!= null && !operationList.isEmpty() && operationList.size() <= 10 && operationList.get(operationList.size() - 1).getOperationType().equals(OperationType.COMMIT);
+        return operationList!= null && !operationList.isEmpty() && operationList.size() <= Constants.MAX_STEPS_PER_TRANSACTION_NO && operationList.get(operationList.size() - 1).getOperationType().equals(OperationType.COMMIT);
     }
 }
