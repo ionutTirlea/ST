@@ -51,6 +51,7 @@ public class History {
 
     }
 
+    /* TODO [ionut.tirlea] implementation */
     public boolean isOCSR(){
 
         if(conflictGraph == null){

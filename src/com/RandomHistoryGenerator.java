@@ -23,7 +23,7 @@ public class RandomHistoryGenerator {
                 } else {
                     operation.setOperationType(OperationType.WRITE);
                 }
-                /* TODO generate random variable (which are the values) */
+                /* TODO [ionut.tirlea] generate random variable (which are the values) */
                 operation.setVariable("x");
                 history.addOperation(operation);
             }
