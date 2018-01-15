@@ -51,7 +51,7 @@ public class History {
 
     }
 
-    /* TODO [ionut.tirlea] implementation */
+    /* TODO */
     public boolean isOCSR(){
 
         if(conflictGraph == null){
@@ -61,9 +61,77 @@ public class History {
         if(!isCSR())
             return false;
 
-        boolean isOCSR = true;
+        List<Operation> commits = this.getOperationList().stream().filter(operation -> operation.getOperationType()==OperationType.COMMIT).collect(Collectors.toList());
+        List<Integer> transactions = this.getOperationList().stream().filter(operation -> operation.getOperationType()==OperationType.COMMIT).map(Operation::getTransactionID).collect(Collectors.toList());
 
-        return isOCSR;
+        for(Operation commit:commits){
+
+            Integer commitIndex = null;
+            for(Operation operation:operationList){
+                if(operation.getOperationType() == OperationType.COMMIT && operation.getTransactionID() == commit.getTransactionID()){
+                    commitIndex = operationList.indexOf(operation);
+                }
+            }
+            if(commitIndex == null){
+                return false;
+            }
+
+            List<Integer> beforeTransactions = new ArrayList<>();
+            for(int i=0; i<commitIndex; i++){
+                if(!beforeTransactions.contains(operationList.get(i).getTransactionID()) && operationList.get(i).getTransactionID() != commit.getTransactionID()){
+                    beforeTransactions.add(operationList.get(i).getTransactionID());
+                }
+            }
+
+            List<Integer> validated = transactions.stream()
+                    .filter(transaction -> beforeTransactions.contains(transaction) == false)
+                    .filter(transaction -> isReachable(commit.getTransactionID(), transaction)).collect(Collectors.toList());
+
+            for(Integer transaction: transactions){
+                if(!beforeTransactions.contains(transaction) && !validated.contains(transaction) && transaction != commit.getTransactionID()){
+                    return false;
+                }
+            }
+        }
+
+        return true;
+
+    }
+
+    private boolean isReachable(int t1, int t2){
+        boolean visited[] = new boolean[conflictGraph.getNodes().size()+1];
+        LinkedList<Integer> queue = new LinkedList<>();
+
+        visited[t1]=true;
+        queue.add(t1);
+
+        while (queue.size()!=0)
+        {
+            int nodeID = queue.poll();
+
+            Node node = null;
+
+            for(Node n: conflictGraph.getNodes()){
+                if(n.getId() == nodeID){
+                    node = n;
+                }
+            }
+
+            if(node == null){
+                return false;
+            }
+
+            for(Node adjacentNode: node.getAdjacentNodes()){
+                if (adjacentNode.getId()==t2)
+                    return true;
+                if (!visited[adjacentNode.getId()])
+                {
+                    visited[adjacentNode.getId()] = true;
+                    queue.add(adjacentNode.getId());
+                }
+            }
+        }
+        return false;
     }
 
     /*
@@ -138,6 +206,7 @@ public class History {
             return false;
 
        return true;
+
     }
 
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
